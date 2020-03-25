@@ -43,6 +43,8 @@ import {
 import StoriesList from './StoriesList';
 import EpicsList from './EpicsList';
 import SprintStats from './SprintStats';
+import { ArcherContainer } from 'react-archer';
+import { colors } from 'tailwindcss/defaultTheme';
 
 interface StateSelector {
   boardListState?: IBoardListState;
@@ -385,322 +387,328 @@ function Board() {
 
   return (
     <BoardContext.Provider value={boardApi}>
-      <div className="w-full flex flex-col h-full">
-        <div className={`flex-grow overflow-y-auto ${isUploadingCsv ? 'opacity-75' : ''}`}>
-          {isFetching && isInitialLoad ? (
-            <div className="flex items-stretch h-screen border-4 ">
-              <div className="mx-auto w-1/12 self-center pb-16">
-                <SquareSpinner className="mt-20" />
+      <ArcherContainer strokeColor={colors.teal[400]}>
+        <div className="w-full flex flex-col h-full">
+          <div className={`flex-grow overflow-y-auto ${isUploadingCsv ? 'opacity-75' : ''}`}>
+            {isFetching && isInitialLoad ? (
+              <div className="flex items-stretch h-screen border-4 ">
+                <div className="mx-auto w-1/12 self-center pb-16">
+                  <SquareSpinner className="mt-20" />
+                </div>
               </div>
-            </div>
-          ) : (
-            <div>
-              <div className="flex flex-row">
-                <div className="flex flex-col lg:w-1/5 md:w-1 sm:w-1  h-screen">
-                  <div className="flex-grow-0 px-4 pt-4">
-                    <div className="w-full mb-4 flex flex-row items-center">
-                      <Link to="/boards" className="mb-2 flex flex-row items-center">
-                        <ChevronLeft size="14" /> Boards
-                      </Link>
-                    </div>
-                    <div className="w-full mb-4 text-2xl font-bold flex-shrink-0">{name}</div>
-                    <div className="flex-grow-0">
-                      <div className="text-xl mb-3">
-                        Epics <span className="text-sm p-2">{countsPhrase('epic', epics)}</span>
+            ) : (
+              <div>
+                <div className="flex flex-row">
+                  <div className="flex flex-col lg:w-1/5 md:w-1 sm:w-1  h-screen">
+                    <div className="flex-grow-0 px-4 pt-4">
+                      <div className="w-full mb-4 flex flex-row items-center">
+                        <Link to="/boards" className="mb-2 flex flex-row items-center">
+                          <ChevronLeft size="14" /> Boards
+                        </Link>
                       </div>
-                      <div className="mb-4">
-                        <CreateEpicZoneForm onSubmit={handleCreateEpic} />
+                      <div className="w-full mb-4 text-2xl font-bold flex-shrink-0">{name}</div>
+                      <div className="flex-grow-0">
+                        <div className="text-xl mb-3">
+                          Epics <span className="text-sm p-2">{countsPhrase('epic', epics)}</span>
+                        </div>
+                        <div className="mb-4">
+                          <CreateEpicZoneForm onSubmit={handleCreateEpic} />
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  <div
-                    className={`${
-                      !isNotificationsActive ? 'flex-grow' : 'flex-grow-0 h-40'
-                    } flex flex-col overflow-scroll`}
-                  >
-                    <div className="px-4">
-                      <EpicsList
-                        epics={epics}
-                        epicAsyncCallStateById={epicAsyncCallStateById}
-                        handleDeleteEpic={handleDeleteEpic}
-                      />
-                    </div>
-                  </div>
-                  <div
-                    className={`${
-                      !isNotificationsActive ? 'flex-grow-0 h-16' : 'flex-grow h-64'
-                    } bg-teal-800 notifications text-white flex flex-col`}
-                  >
                     <div
-                      className="tab flex justify-end items-center relative text-sm border-t-2 border-gray-300 p-4 "
-                      onClick={() => setIsNotificationsActive(!isNotificationsActive)}
+                      className={`${
+                        !isNotificationsActive ? 'flex-grow' : 'flex-grow-0 h-40'
+                      } flex flex-col overflow-scroll`}
                     >
-                      <div className="mr-2">Notifications </div>
-                      {notifications && notifications.length > 0 ? (
-                        <div className=" text-xs px-2 py-1 bg-red-600 text-white center rounded-full">
-                          {notifications.length}
-                        </div>
-                      ) : (
-                        <div className="text-xs px-2 py-1 bg-gray-600 text-white center rounded-full">
-                          0
-                        </div>
-                      )}
+                      <div className="px-4">
+                        <EpicsList
+                          epics={epics}
+                          epicAsyncCallStateById={epicAsyncCallStateById}
+                          handleDeleteEpic={handleDeleteEpic}
+                        />
+                      </div>
                     </div>
                     <div
                       className={`${
-                        !isNotificationsActive ? 'hidden' : ''
-                      } p-4 flex-grow overflow-scroll`}
+                        !isNotificationsActive ? 'flex-grow-0 h-16' : 'flex-grow h-64'
+                      } bg-teal-800 notifications text-white flex flex-col`}
                     >
-                      {notifications && notifications.length > 0 ? (
-                        notifications.map((notification: INotification, i) => {
-                          const {
-                            storyRequestId,
-                            epic,
-                            sender: senderBoard,
-                            notes,
-                            points,
-                            description,
-                            sprint,
-                          } = notification;
-                          return (
-                            <div
-                              key={i}
-                              className="border-b-2 border-dotted border-teal-700 pb-4 mb-4"
-                            >
-                              <div className="text-sm">
-                                <span className="font-black">{senderBoard}</span> has requested to
-                                add a story "<span className="font-black">{description}</span>" to
-                                this board in sprint <span className="font-black">{sprint}</span>,
-                                epic <span className="font-black">{epic}</span>
-                              </div>{' '}
-                              {notes && (
-                                <div className="border-l-2 border-teal-500 pl-2 text-sm mt-2">
-                                  Notes:
-                                  <div>{notes}</div>
-                                </div>
-                              )}
-                              <div className=" bg-teal-700 mt-2 p-2">
-                                <div>
-                                  <input
-                                    className="text-sm"
-                                    placeholder="Notes (eg Rejecting because...)"
-                                    onChange={e =>
-                                      setInputNotes({
-                                        ...inputNotes,
-                                        [storyRequestId]: e.target.value,
-                                      })
-                                    }
-                                  />
-                                </div>
-                                <div className="flex flex-row mt-2">
-                                  <button
-                                    className="btn btn-minimal text-sm w-1/2 mr-2"
-                                    onClick={() =>
-                                      handleAcceptOrRejectStoryRequest(
-                                        storyRequestId,
-                                        STORY_REQUEST_ACTION.Reject,
-                                        inputNotes[storyRequestId] || ''
-                                      )
-                                    }
-                                  >
-                                    Reject
-                                  </button>
-                                  <button
-                                    className="btn btn-primary py-1 text-sm w-1/2"
-                                    onClick={() =>
-                                      handleAcceptOrRejectStoryRequest(
-                                        storyRequestId,
-                                        STORY_REQUEST_ACTION.Accept,
-                                        inputNotes[storyRequestId] || ''
-                                      )
-                                    }
-                                  >
-                                    Accept
-                                  </button>
+                      <div
+                        className="tab flex justify-end items-center relative text-sm border-t-2 border-gray-300 p-4 "
+                        onClick={() => setIsNotificationsActive(!isNotificationsActive)}
+                      >
+                        <div className="mr-2">Notifications </div>
+                        {notifications && notifications.length > 0 ? (
+                          <div className=" text-xs px-2 py-1 bg-red-600 text-white center rounded-full">
+                            {notifications.length}
+                          </div>
+                        ) : (
+                          <div className="text-xs px-2 py-1 bg-gray-600 text-white center rounded-full">
+                            0
+                          </div>
+                        )}
+                      </div>
+                      <div
+                        className={`${
+                          !isNotificationsActive ? 'hidden' : ''
+                        } p-4 flex-grow overflow-scroll`}
+                      >
+                        {notifications && notifications.length > 0 ? (
+                          notifications.map((notification: INotification, i) => {
+                            const {
+                              storyRequestId,
+                              epic,
+                              sender: senderBoard,
+                              notes,
+                              points,
+                              description,
+                              sprint,
+                            } = notification;
+                            return (
+                              <div
+                                key={i}
+                                className="border-b-2 border-dotted border-teal-700 pb-4 mb-4"
+                              >
+                                <div className="text-sm">
+                                  <span className="font-black">{senderBoard}</span> has requested to
+                                  add a story "<span className="font-black">{description}</span>" to
+                                  this board in sprint <span className="font-black">{sprint}</span>,
+                                  epic <span className="font-black">{epic}</span>
+                                </div>{' '}
+                                {notes && (
+                                  <div className="border-l-2 border-teal-500 pl-2 text-sm mt-2">
+                                    Notes:
+                                    <div>{notes}</div>
+                                  </div>
+                                )}
+                                <div className=" bg-teal-700 mt-2 p-2">
+                                  <div>
+                                    <input
+                                      className="text-sm"
+                                      placeholder="Notes (eg Rejecting because...)"
+                                      onChange={e =>
+                                        setInputNotes({
+                                          ...inputNotes,
+                                          [storyRequestId]: e.target.value,
+                                        })
+                                      }
+                                    />
+                                  </div>
+                                  <div className="flex flex-row mt-2">
+                                    <button
+                                      className="btn btn-minimal text-sm w-1/2 mr-2"
+                                      onClick={() =>
+                                        handleAcceptOrRejectStoryRequest(
+                                          storyRequestId,
+                                          STORY_REQUEST_ACTION.Reject,
+                                          inputNotes[storyRequestId] || ''
+                                        )
+                                      }
+                                    >
+                                      Reject
+                                    </button>
+                                    <button
+                                      className="btn btn-primary py-1 text-sm w-1/2"
+                                      onClick={() =>
+                                        handleAcceptOrRejectStoryRequest(
+                                          storyRequestId,
+                                          STORY_REQUEST_ACTION.Accept,
+                                          inputNotes[storyRequestId] || ''
+                                        )
+                                      }
+                                    >
+                                      Accept
+                                    </button>
+                                  </div>
                                 </div>
                               </div>
+                            );
+                          })
+                        ) : (
+                          <div className="italic text-teal-600 text-sm">No new notifications</div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="w-full flex flex-row">
+                    <div className="w-3/4 h-screen flex flex-col bg-gray-100">
+                      <div className="flex flex-grow-0 justify-between items-center mb-4 px-10 py-4">
+                        <div className="mr-2 text-sm text-gray-600">
+                          Last refreshed {moment(lastRefresh).fromNow(false)}
+                        </div>
+                        <div className="flex flex-row">
+                          <input
+                            type="file"
+                            id="file"
+                            className="hidden"
+                            ref={uploadInputRef}
+                            onChange={handleFileChange}
+                          />
+                          <button
+                            name="button"
+                            value="Upload"
+                            className="btn btn-primary mr-2"
+                            onClick={handleUploadClick}
+                          >
+                            {isUploadingCsv ? (
+                              <Loader type="ThreeDots" color="#ffffff" width={20} height={20} />
+                            ) : (
+                              'Upload CSV'
+                            )}
+                          </button>{' '}
+                          <button
+                            className="btn btn-primary mr-2"
+                            onClick={handleExportCsv}
+                            disabled={!hasStoriesAndSprints}
+                          >
+                            Export CSV
+                          </button>
+                          <button
+                            className="btn btn-primary"
+                            onClick={handleSolve}
+                            disabled={!hasStoriesAndSprints}
+                          >
+                            Auto Arrange
+                          </button>
+                        </div>
+                      </div>
+                      <div className="flex-grow overflow-scroll px-10 pb-16">
+                        <div className="flex flex-row items-center mb-3">
+                          <div className="text-xl">Sprints</div>
+                          <span className="text-sm p-2">{countsPhrase('sprint', sprints)}</span>
+                        </div>
+                        {isSolving || isUploadingCsv ? (
+                          <SquareSpinner className="mt-20" />
+                        ) : (
+                          <div>
+                            {sprints && sprints.length > 0 ? (
+                              sprints.map((sprint, i) => {
+                                const { id: sprintId, tickets, capacity } = sprint;
+                                const {
+                                  [sprintId]: sprintCallState = {},
+                                } = sprintAsyncCallStateById;
+                                const { isLoading: isSprintLoading = false } = sprintCallState;
+                                const load = loadMap[sprintId];
+                                const loadLeft = capacity - load;
+
+                                return (
+                                  <Sprint
+                                    key={i}
+                                    {...sprint}
+                                    onDelete={handleDeleteSprint}
+                                    onEdit={handleEditSprint}
+                                    isLoading={isSprintLoading}
+                                  >
+                                    <SprintStats
+                                      storiesCount={storiesCountMap[sprintId]}
+                                      currentLoadCount={load}
+                                      loadLeftCount={loadLeft}
+                                    />
+                                    <StoriesList
+                                      sprintId={sprintId}
+                                      stories={tickets}
+                                      activeStoryId={activeStoryId}
+                                      storyAsyncCallStateById={storyAsyncCallStateById}
+                                      emptyListMessage="No stories found in this sprint"
+                                    />
+                                  </Sprint>
+                                );
+                              })
+                            ) : (
+                              <div className="italic text-gray-500">No Sprints found</div>
+                            )}
+                            <div className="mt-4">
+                              <CreateSprintZoneForm onSubmit={handleCreateSprint} />
                             </div>
-                          );
-                        })
-                      ) : (
-                        <div className="italic text-teal-600 text-sm">No new notifications</div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-                <div className="w-full flex flex-row">
-                  <div className="w-3/4 h-screen flex flex-col bg-gray-100">
-                    <div className="flex flex-grow-0 justify-between items-center mb-4 px-10 py-4">
-                      <div className="mr-2 text-sm text-gray-600">
-                        Last refreshed {moment(lastRefresh).fromNow(false)}
-                      </div>
-                      <div className="flex flex-row">
-                        <input
-                          type="file"
-                          id="file"
-                          className="hidden"
-                          ref={uploadInputRef}
-                          onChange={handleFileChange}
-                        />
-                        <button
-                          name="button"
-                          value="Upload"
-                          className="btn btn-primary mr-2"
-                          onClick={handleUploadClick}
-                        >
-                          {isUploadingCsv ? (
-                            <Loader type="ThreeDots" color="#ffffff" width={20} height={20} />
-                          ) : (
-                            'Upload CSV'
-                          )}
-                        </button>{' '}
-                        <button
-                          className="btn btn-primary mr-2"
-                          onClick={handleExportCsv}
-                          disabled={!hasStoriesAndSprints}
-                        >
-                          Export CSV
-                        </button>
-                        <button
-                          className="btn btn-primary"
-                          onClick={handleSolve}
-                          disabled={!hasStoriesAndSprints}
-                        >
-                          Auto Arrange
-                        </button>
-                      </div>
-                    </div>
-                    <div className="flex-grow overflow-scroll px-10 pb-16">
-                      <div className="flex flex-row items-center mb-3">
-                        <div className="text-xl">Sprints</div>
-                        <span className="text-sm p-2">{countsPhrase('sprint', sprints)}</span>
-                      </div>
-                      {isSolving || isUploadingCsv ? (
-                        <SquareSpinner className="mt-20" />
-                      ) : (
-                        <div>
-                          {sprints && sprints.length > 0 ? (
-                            sprints.map((sprint, i) => {
-                              const { id: sprintId, tickets, capacity } = sprint;
-                              const { [sprintId]: sprintCallState = {} } = sprintAsyncCallStateById;
-                              const { isLoading: isSprintLoading = false } = sprintCallState;
-                              const load = loadMap[sprintId];
-                              const loadLeft = capacity - load;
-
-                              return (
-                                <Sprint
-                                  key={i}
-                                  {...sprint}
-                                  onDelete={handleDeleteSprint}
-                                  onEdit={handleEditSprint}
-                                  isLoading={isSprintLoading}
-                                >
-                                  <SprintStats
-                                    storiesCount={storiesCountMap[sprintId]}
-                                    currentLoadCount={load}
-                                    loadLeftCount={loadLeft}
-                                  />
-                                  <StoriesList
-                                    sprintId={sprintId}
-                                    stories={tickets}
-                                    activeStoryId={activeStoryId}
-                                    storyAsyncCallStateById={storyAsyncCallStateById}
-                                    emptyListMessage="No stories found in this sprint"
-                                  />
-                                </Sprint>
-                              );
-                            })
-                          ) : (
-                            <div className="italic text-gray-500">No Sprints found</div>
-                          )}
-                          <div className="mt-4">
-                            <CreateSprintZoneForm onSubmit={handleCreateSprint} />
                           </div>
+                        )}
+                      </div>
+                    </div>
+                    <div className="lg:w-1/4 md:w-1 sm:w-1 h-screen overflow-scroll px-10 pt-4 bg-gray-200 flex-grow ">
+                      <div className=" flex flex-row items-center mb-3">
+                        <div className="text-xl">Backlog</div>
+                        <span className="text-sm p-2">{countsPhrase('story', unassigned)}</span>
+                      </div>
+                      {epics && epics.length > 0 ? (
+                        <div>
+                          <div className="mb-4">
+                            <CreateStoryZoneForm onSubmit={handleCreateStory} epics={epics} />
+                          </div>
+                          <StoriesList
+                            stories={unassigned}
+                            activeStoryId={activeStoryId}
+                            storyAsyncCallStateById={storyAsyncCallStateById}
+                            emptyListMessage="No backlog stories found"
+                          />
                         </div>
+                      ) : (
+                        <span className="italic text-gray-500">
+                          Create an Epic first to create stories
+                        </span>
                       )}
                     </div>
                   </div>
-                  <div className="lg:w-1/4 md:w-1 sm:w-1 h-screen overflow-scroll px-10 pt-4 bg-gray-200 flex-grow ">
-                    <div className=" flex flex-row items-center mb-3">
-                      <div className="text-xl">Backlog</div>
-                      <span className="text-sm p-2">{countsPhrase('story', unassigned)}</span>
-                    </div>
-                    {epics && epics.length > 0 ? (
-                      <div>
-                        <div className="mb-4">
-                          <CreateStoryZoneForm onSubmit={handleCreateStory} epics={epics} />
-                        </div>
-                        <StoriesList
-                          stories={unassigned}
-                          activeStoryId={activeStoryId}
-                          storyAsyncCallStateById={storyAsyncCallStateById}
-                          emptyListMessage="No backlog stories found"
-                        />
-                      </div>
-                    ) : (
-                      <span className="italic text-gray-500">
-                        Create an Epic first to create stories
-                      </span>
-                    )}
-                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+          {dependencyMode && (
+            <DependencyModeModal story={activeStory} onCancel={exitDependencyMode} />
+          )}
+          {dependencyMode}
+
+          <Dialog
+            open={isDeleteDialogOpen}
+            onClose={() => setIsDeleteDialogOpen(false)}
+            onConfirm={handleConfirmEpicDelete}
+            closeOnOutsideClick={true}
+            className="w-1/3"
+            intent="danger"
+          >
+            <div className="mb-3">
+              You are deleting epic:{' '}
+              <div className="flex flex-row items-center mt-4">
+                <span className="tag mr-2">{epicToDelete.id}</span>
+                <div className="text-lg">{epicToDelete.name}</div>
+              </div>
+            </div>
+
+            <div>
+              This will delete all stories under this epic. Are you sure you want to delete?
+            </div>
+          </Dialog>
+          <Dialog
+            open={isWithdrawDialogOpen}
+            onClose={() => setIsWithdrawDialogOpen(false)}
+            onConfirm={handleConfirmRequestWithdraw}
+            closeOnOutsideClick={true}
+            className="w-1/3"
+            intent="danger"
+          >
+            <div className="mb-3">
+              You are withdrawing request for this story:
+              <div className="flex flex-col items-center mt-4">
+                <div className="mb-2">{requestToWithdraw.storyDescription}</div>
+                <div>
+                  <input
+                    className=""
+                    type="text"
+                    name="notes"
+                    placeholder="notes"
+                    onChange={e =>
+                      setRequestToWithdraw({ ...requestToWithdraw, notes: e.target.value })
+                    }
+                  />
                 </div>
               </div>
             </div>
-          )}
+
+            <div>Withdraw?</div>
+          </Dialog>
         </div>
-        {dependencyMode && (
-          <DependencyModeModal story={activeStory} onCancel={exitDependencyMode} />
-        )}
-        {dependencyMode}
-
-        <Dialog
-          open={isDeleteDialogOpen}
-          onClose={() => setIsDeleteDialogOpen(false)}
-          onConfirm={handleConfirmEpicDelete}
-          closeOnOutsideClick={true}
-          className="w-1/3"
-          intent="danger"
-        >
-          <div className="mb-3">
-            You are deleting epic:{' '}
-            <div className="flex flex-row items-center mt-4">
-              <span className="tag mr-2">{epicToDelete.id}</span>
-              <div className="text-lg">{epicToDelete.name}</div>
-            </div>
-          </div>
-
-          <div>This will delete all stories under this epic. Are you sure you want to delete?</div>
-        </Dialog>
-        <Dialog
-          open={isWithdrawDialogOpen}
-          onClose={() => setIsWithdrawDialogOpen(false)}
-          onConfirm={handleConfirmRequestWithdraw}
-          closeOnOutsideClick={true}
-          className="w-1/3"
-          intent="danger"
-        >
-          <div className="mb-3">
-            You are withdrawing request for this story:
-            <div className="flex flex-col items-center mt-4">
-              <div className="mb-2">{requestToWithdraw.storyDescription}</div>
-              <div>
-                <input
-                  className=""
-                  type="text"
-                  name="notes"
-                  placeholder="notes"
-                  onChange={e =>
-                    setRequestToWithdraw({ ...requestToWithdraw, notes: e.target.value })
-                  }
-                />
-              </div>
-            </div>
-          </div>
-
-          <div>Withdraw?</div>
-        </Dialog>
-      </div>
+      </ArcherContainer>
     </BoardContext.Provider>
   );
 }

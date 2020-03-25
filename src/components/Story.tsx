@@ -10,6 +10,7 @@ import classnames from 'classnames';
 import CrossBoardDependencies from './CrossBoardDependencies';
 import CrossBoardDependenciesList from './CrossBoardDependenciesList';
 import { BoardContext } from './Board';
+import { ArcherElement } from 'react-archer';
 
 interface IStoryProps {
   isLoading: boolean;
@@ -137,6 +138,8 @@ const Story: React.FunctionComponent<IStory & IStoryProps> = ({
     'active shadow-lg ': isDependenciesViewActive,
   });
 
+  const getId = id => `story-${id}`;
+
   return (
     <div
       className={`story ${storyClassNames}`}
@@ -241,7 +244,20 @@ const Story: React.FunctionComponent<IStory & IStoryProps> = ({
 
           <div className="flex flex-col justify-center px-1 flex-grow-0">
             <div>
-              <div className="tag rounded-lg text-center">{id}</div>
+              <ArcherElement
+                id={getId(id)}
+                relations={
+                  !dependencies
+                    ? []
+                    : dependencies.map(d => ({
+                        targetId: getId(d),
+                        sourceAnchor: 'middle',
+                        targetAnchor: 'middle',
+                      }))
+                }
+              >
+                <div className="tag rounded-lg text-center">{id}</div>
+              </ArcherElement>
             </div>
             <div className=" h-6 w-6 flex flex-row items-center justify-center">
               {isLoading ? (

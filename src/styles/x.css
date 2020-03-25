@@ -480,3 +480,11 @@ textarea {
     height: 0%;
   }
 }
+
+svg {
+  z-index: 1;
+  /* Brilliant and terrifying hack from https://stackoverflow.com/a/26931709 */
+  height: 0px;
+  overflow: visible;
+  pointer-events: none;
+}
