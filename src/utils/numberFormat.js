@@ -49,9 +49,13 @@ export function isInt(n) {
 }
 
 export function scrubFormatting(value) {
+export function scrubFormatting(value) {
   return value
     .toString()
-    .replace('$', '')
+    .replace(/\$/g, '') // Use a regex with global flag to replace all occurrences of '$'
+    .replace(/,/g, '')  // Also replace all occurrences of ',' globally
+    .replace(/\./g, ''); // Also replace all occurrences of '.' globally
+}
     .replace(',', '')
     .replace('.', '');
 }
