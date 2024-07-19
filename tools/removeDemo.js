@@ -1,9 +1,12 @@
 // This script removes demo app files
 import rimraf from 'rimraf';
 import fs from 'fs';
+import path from 'path';
 import { chalkSuccess } from './chalkConfig';
 
 /* eslint-disable no-console */
+
+const basePath = '/app/restricted/';
 
 const pathsToRemove = [
   './src/actions/*',
@@ -37,14 +40,28 @@ const filesToCreate = [
 ];
 
 function removePath(path, callback) {
-  rimraf(path, error => {
+  const joinedPath = path.join(basePath, path);
+  const fullPath = path.normalize(joinedPath);
+  if (!fullPath.startsWith(basePath)) {
+    console.log("Invalid path specified!");
+    return;
+  }
+  
+  rimraf(fullPath, error => {
     if (error) throw new Error(error);
     callback();
   });
 }
 
 function createFile(file) {
-  fs.writeFile(file.path, file.content, error => {
+  const joinedPath = path.join(basePath, file.path);
+  const fullPath = path.normalize(joinedPath);
+  if (!fullPath.startsWith(basePath)) {
+    console.log("Invalid path specified!");
+    return;
+  }
+  
+  fs.writeFile(fullPath, file.content, error => {
     if (error) throw new Error(error);
   });
 }
