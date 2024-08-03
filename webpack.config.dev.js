@@ -110,6 +110,10 @@ export default {
           {
             loader: 'postcss-loader',
             options: {
+              /**
+               * This method is used to use external plugins in the application. It requires plugins: 'postcss-import', 'tailwindcss', and 'autoprefixer'.
+               * @returns {Array} An array of required plugins. 
+               */
               plugins: () => [
                 require('postcss-import'),
                 require('tailwindcss'),
