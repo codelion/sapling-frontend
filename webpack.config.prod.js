@@ -146,6 +146,11 @@ export default {
           {
             loader: 'postcss-loader',
             options: {
+              /**
+               * This function represents a configuration for the postCSS plugins.
+               * It does not accept any parameters or return any output. 
+               * It is assigning a new array of required modules to the `plugins` attribute.
+               */
               plugins: () => [
                 require('postcss-import'),
                 require('tailwindcss'),
